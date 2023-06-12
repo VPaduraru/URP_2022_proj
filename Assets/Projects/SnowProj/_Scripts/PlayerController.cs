@@ -8,7 +8,10 @@ namespace SnowProject
     {
         [Header("Movement values")]
         [SerializeField]
-        private float _movementSpeed = 10f;
+        private float _maxSpeed = 10f;
+        [SerializeField]
+        private float _minSpeed = 2f;
+        private float _currentSpeed = 10f;
         private Vector3 _movementVector;
         [SerializeField]
         private GameObject _cameraPivot;
@@ -34,7 +37,7 @@ namespace SnowProject
         private void MovementInput()
         {
             _movementVector = Input.GetAxis("Horizontal") * transform.right + Input.GetAxis("Vertical") * transform.forward;
-            _movementVector = _movementSpeed * Time.deltaTime * _movementVector.normalized;
+            _movementVector = _currentSpeed * Time.deltaTime * _movementVector.normalized;
         }
 
         private void Movement()
@@ -53,6 +56,11 @@ namespace SnowProject
             _verticalRotation = Mathf.Clamp(_verticalRotation, -20, 40);
             transform.Rotate(Vector3.up, Input.GetAxis("Mouse X"));
             _cameraPivot.transform.localEulerAngles = new Vector3(_verticalRotation, _cameraPivot.transform.localEulerAngles.y, _cameraPivot.transform.localEulerAngles.z);
+        }
+
+        public void SetSpeed01(float val)
+        {
+            _currentSpeed = Mathf.Lerp(_minSpeed, _maxSpeed, val);
         }
     }
 }
