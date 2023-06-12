@@ -26,14 +26,7 @@ public class SnowController : MonoBehaviour
         }
         _snowPathTexture.Apply();
 
-        Debug.LogFormat("SnowMeltingMask values: ");
-        for (int i = 0; i < _snowMeltingMask.height; i++)
-        {
-            for (int j = 0; j < _snowMeltingMask.width; j++)
-            {
-                Debug.LogFormat("X: {0}, Y: {1}, value: {2}", j, i, _snowMeltingMask.GetPixel(j, i).r);
-            }
-        }
+
     }
 
     private void Update()
@@ -43,8 +36,9 @@ public class SnowController : MonoBehaviour
 
     private void PaintOnTexture()
     {
-        float playerPosX01 = Mathf.InverseLerp(100, -100, _playerTransform.position.x);
-        float playerPosZ01 = Mathf.InverseLerp(100, -100, _playerTransform.position.z);
+        float planeScale = _snowPlaneMeshRenderer.gameObject.transform.localScale.x;
+        float playerPosX01 = Mathf.InverseLerp(planeScale, -planeScale, _playerTransform.position.x);
+        float playerPosZ01 = Mathf.InverseLerp(planeScale, -planeScale, _playerTransform.position.z);
         int texturePosX = Mathf.RoundToInt(Mathf.Lerp(0, _textureRes, playerPosX01));
         int texturePosY = Mathf.RoundToInt(Mathf.Lerp(0, _textureRes, playerPosZ01));
 
