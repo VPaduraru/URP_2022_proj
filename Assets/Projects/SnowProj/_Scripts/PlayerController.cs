@@ -27,16 +27,18 @@ namespace SnowProject
         private void Update()
         {
             MouseRotation();
+            MovementInput();
 
+        }
+
+        private void MovementInput()
+        {
             _movementVector = Input.GetAxis("Horizontal") * transform.right + Input.GetAxis("Vertical") * transform.forward;
             _movementVector = _movementSpeed * Time.deltaTime * _movementVector.normalized;
-
-
         }
 
         private void Movement()
         {
-            
             _charController.Move(_movementVector);
         }
 
