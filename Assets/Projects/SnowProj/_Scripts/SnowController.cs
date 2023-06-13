@@ -65,6 +65,7 @@ namespace SnowProject
 
             _snowPathTexture.Apply();
             _snowPlaneMeshRenderer.material.SetTexture("_InteractiveSnowTexture", _snowPathTexture);
+            _snowPlaneMeshRenderer.material.SetVector("_PlayerPosition", new Vector4(_playerTransform.position.x, _playerTransform.position.y, _playerTransform.position.z));
         }
     }
 }
