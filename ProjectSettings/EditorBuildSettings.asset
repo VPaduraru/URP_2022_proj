@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/Projects/Shaenanigans/_Scenes/SampleScene.unity
+  - enabled: 0
+    path: Assets/Projects/Others/_Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Projects/SnowProj/_Scenes/SnowScene.unity
+    guid: 14ca57654c388294791ac375fc0f1942
   m_configObjects: {}

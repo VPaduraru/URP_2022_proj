@@ -15,7 +15,11 @@ namespace SnowProject
         private Texture2D _snowMeltingMask;
         [SerializeField]
         private MeshRenderer _snowPlaneMeshRenderer;
+        [field: SerializeField]
+        [Range(0.0f, 5.0f)]
+        private float _playerSnowMeltingRate = 1.5f;
         private int _textureRes = 1024;
+
 
         private void Awake()
         {
@@ -35,7 +39,10 @@ namespace SnowProject
 
         private void Update()
         {
-            PaintOnTexture();
+            if (_playerController.IsPlayerMoving)
+            {
+                PaintOnTexture();
+            }
         }
 
         private void PaintOnTexture()
@@ -57,7 +64,7 @@ namespace SnowProject
                     int xPos = texturePosX + j - halfMaskWidthHeight;
                     int yPos = texturePosY + i - halfMaskWidthHeight;
                     float brightVal = _snowPathTexture.GetPixel(xPos, yPos).r;
-                    brightVal -= _snowMeltingMask.GetPixel(j, i).r * 1.5f * Time.deltaTime;
+                    brightVal -= _snowMeltingMask.GetPixel(j, i).r * _playerSnowMeltingRate * Time.deltaTime;
                     Color colorToApply = new Color(brightVal, brightVal, brightVal);
                     _snowPathTexture.SetPixel(xPos, yPos, colorToApply);
                 }
@@ -66,6 +73,24 @@ namespace SnowProject
             _snowPathTexture.Apply();
             _snowPlaneMeshRenderer.material.SetTexture("_InteractiveSnowTexture", _snowPathTexture);
             _snowPlaneMeshRenderer.material.SetVector("_PlayerPosition", new Vector4(_playerTransform.position.x, _playerTransform.position.y, _playerTransform.position.z));
+        }
+
+        /// <summary>
+        /// Extremely inefficient
+        /// </summary>
+        private void RefillTexture()
+        {
+
+            for (int i = 0; i < _snowPathTexture.height; i++)
+            {
+                for (int j = 0; j < _snowPathTexture.width; j++)
+                {
+                    Color c = _snowPathTexture.GetPixel(j, i);
+                    float val = 0.1f;
+                    c.r += val;
+                    _snowPathTexture.SetPixel(j, i, c);
+                }
+            }
         }
     }
 }

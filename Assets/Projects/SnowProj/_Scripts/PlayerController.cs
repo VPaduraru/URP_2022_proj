@@ -17,6 +17,8 @@ namespace SnowProject
         private GameObject _cameraPivot;
         private float _verticalRotation = 0f;
         private CharacterController _charController;
+        [HideInInspector]
+        public bool IsPlayerMoving { get; private set; } = false;
         private void Awake()
         {
             _charController = GetComponent<CharacterController>();
@@ -36,8 +38,18 @@ namespace SnowProject
 
         private void MovementInput()
         {
-            _movementVector = Input.GetAxis("Horizontal") * transform.right + Input.GetAxis("Vertical") * transform.forward;
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
+            _movementVector = horizontal * transform.right + vertical * transform.forward;
             _movementVector = _currentSpeed * Time.deltaTime * _movementVector.normalized;
+            if (Mathf.Abs(horizontal) > 0 || Mathf.Abs(vertical) > 0)
+            {
+                IsPlayerMoving = true;
+            }
+            else
+            {
+                IsPlayerMoving = false;
+            }
         }
 
         private void Movement()
