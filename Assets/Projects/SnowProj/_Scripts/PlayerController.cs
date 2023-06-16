@@ -3,6 +3,7 @@ namespace SnowProject
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.Events;
 
     public class PlayerController : MonoBehaviour
     {
@@ -17,6 +18,15 @@ namespace SnowProject
         private GameObject _cameraPivot;
         private float _verticalRotation = 0f;
         private CharacterController _charController;
+
+        #region Gameplay Mechanincs
+        float _currentPlaneHeight = 0;
+        float _accumulatedSnow = 0f;
+        #endregion
+
+        #region Events
+        public UnityEvent OnCollectSnow = new UnityEvent();
+        #endregion
         [HideInInspector]
         public bool IsPlayerMoving { get; private set; } = false;
         private void Awake()
@@ -33,7 +43,22 @@ namespace SnowProject
         {
             MouseRotation();
             MovementInput();
+            float rightRotationAngle = transform.eulerAngles.y;
+            if (Input.GetButton("Fire1"))
+            {
+                SnowController.Instance.PaintOnTextureCustomMaskFromPlayerRotation(transform.eulerAngles.y);
+            }
+            //Debug.LogFormat("Forward: {0}, Right: {1}", forward, right);
+            //Debug.LogFormat("rightRotationAngle: {0}", rightRotationAngle);
 
+            _currentPlaneHeight = SnowController.Instance.GetCurrentPlaneHeight();
+            SetSpeed01();
+
+            if (IsPlayerMoving)
+            {
+                _accumulatedSnow += SnowController.Instance.PaintOnTexture();
+                OnCollectSnow.Invoke();
+            }
         }
 
         private void MovementInput()
@@ -70,9 +95,23 @@ namespace SnowProject
             _cameraPivot.transform.localEulerAngles = new Vector3(_verticalRotation, _cameraPivot.transform.localEulerAngles.y, _cameraPivot.transform.localEulerAngles.z);
         }
 
-        public void SetSpeed01(float val)
+        private void AccumulateSnow()
         {
-            _currentSpeed = Mathf.Lerp(_minSpeed, _maxSpeed, val);
+            if (IsPlayerMoving)
+            {
+                _accumulatedSnow += _currentPlaneHeight / 100f;
+                OnCollectSnow.Invoke();
+            }
+        }
+
+        public float GetAccumulatedSnow()
+        {
+            return _accumulatedSnow;
+        }
+
+        private void SetSpeed01()
+        {
+            _currentSpeed = Mathf.Lerp(_minSpeed, _maxSpeed, -(Mathf.Cos(Mathf.PI * (1 - _currentPlaneHeight)) - 1) / 2);
         }
     }
 }

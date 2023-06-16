@@ -14,15 +14,33 @@ namespace SnowProject
         [SerializeField]
         private Texture2D _snowMeltingMask;
         [SerializeField]
+        private Texture2D _toolMeltingMask;
+        [SerializeField]
         private MeshRenderer _snowPlaneMeshRenderer;
         [field: SerializeField]
         [Range(0.0f, 5.0f)]
         private float _playerSnowMeltingRate = 1.5f;
         private int _textureRes = 1024;
 
+        public static SnowController Instance { get; private set; }
+
+
+        private float _planeScaleX;
+        private float _playerPosX01;
+        private float _playerPosZ01;
+        private int _texturePosX;
+        private int _texturePosY;
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                Instance = this;
+            }
             _playerController = _playerTransform.gameObject.GetComponent<PlayerController>();
             _snowPathTexture = new Texture2D(_textureRes, _textureRes, TextureFormat.RGBA32, false);
             for (int i = 0; i < _textureRes; i++)
@@ -34,63 +52,104 @@ namespace SnowProject
             }
             _snowPathTexture.Apply();
 
-
+            _planeScaleX = _snowPlaneMeshRenderer.gameObject.transform.localScale.x;
         }
 
         private void Update()
         {
-            if (_playerController.IsPlayerMoving)
-            {
-                PaintOnTexture();
-            }
+            CalculatePlayerPositionOnPlane();
+            CalculatePlayerPositionOnTexture();
+
         }
 
-        private void PaintOnTexture()
+        private void CalculatePlayerPositionOnPlane()
         {
-            float planeScale = _snowPlaneMeshRenderer.gameObject.transform.localScale.x;
-            float playerPosX01 = Mathf.InverseLerp(planeScale, -planeScale, _playerTransform.position.x);
-            float playerPosZ01 = Mathf.InverseLerp(planeScale, -planeScale, _playerTransform.position.z);
-            int texturePosX = Mathf.RoundToInt(Mathf.Lerp(0, _textureRes, playerPosX01));
-            int texturePosY = Mathf.RoundToInt(Mathf.Lerp(0, _textureRes, playerPosZ01));
+            _playerPosX01 = Mathf.InverseLerp(_planeScaleX, -_planeScaleX, _playerTransform.position.x);
+            _playerPosZ01 = Mathf.InverseLerp(_planeScaleX, -_planeScaleX, _playerTransform.position.z);
+        }
 
-            _playerController.SetSpeed01(1 - _snowPathTexture.GetPixel(texturePosX, texturePosY).r);
+        private void CalculatePlayerPositionOnTexture()
+        {
+            _texturePosX = Mathf.RoundToInt(Mathf.Lerp(0, _textureRes, _playerPosX01));
+            _texturePosY = Mathf.RoundToInt(Mathf.Lerp(0, _textureRes, _playerPosZ01));
+        }
+        public float GetCurrentPlaneHeight()
+        {
+            return _snowPathTexture.GetPixel(_texturePosX, _texturePosY).r;
+        }
+        public void PaintOnTextureCustomMaskFromPlayerRotation(float rotationDegrees)
+        {
+            float rads = -rotationDegrees * Mathf.Deg2Rad - Mathf.PI;
+            rads += Random.Range(-.1f, .1f);
+            int maskHalfWidth = _toolMeltingMask.width / 2;
+
+            int xOffset = (int)(_texturePosX + _playerController.transform.forward.x * -20);
+            int yOffset = (int)(_texturePosY + _playerController.transform.forward.z * -20);
 
 
-            int halfMaskWidthHeight = _snowMeltingMask.width / 2;
-            for (int i = 0; i < _snowMeltingMask.height; i++)
+
+            Vector2 row0 = new Vector2(Mathf.Cos(rads), -Mathf.Sin(rads));
+            Vector2 row1 = new Vector2(Mathf.Sin(rads), Mathf.Cos(rads));
+
+            for (int y = 0; y < _toolMeltingMask.height; y++)
             {
-                for (int j = 0; j < _snowMeltingMask.width; j++)
+                for (int x = 0; x < _toolMeltingMask.width; x++)
                 {
-                    int xPos = texturePosX + j - halfMaskWidthHeight;
-                    int yPos = texturePosY + i - halfMaskWidthHeight;
-                    float brightVal = _snowPathTexture.GetPixel(xPos, yPos).r;
-                    brightVal -= _snowMeltingMask.GetPixel(j, i).r * _playerSnowMeltingRate * Time.deltaTime;
-                    Color colorToApply = new Color(brightVal, brightVal, brightVal);
-                    _snowPathTexture.SetPixel(xPos, yPos, colorToApply);
+                    float r = _toolMeltingMask.GetPixel(x, y).r;
+
+                    int newX = x - maskHalfWidth;
+                    int newY = y;
+
+                    // Apply rotation transformation
+                    int rotatedX = Mathf.RoundToInt(newX * row0.x + newY * row0.y);
+                    int rotatedY = Mathf.RoundToInt(newX * row1.x + newY * row1.y);
+
+                    // Offset the position relative to the player
+                    int finalX = rotatedX + xOffset;
+                    int finalY = rotatedY + yOffset;
+
+                    float val = _snowPathTexture.GetPixel(finalX, finalY).r;
+                    val -= r * Time.deltaTime * _playerSnowMeltingRate / 2;
+                    val = Mathf.Clamp01(val);
+                    Color c = new Color(val, val, val);
+
+                    _snowPathTexture.SetPixel(finalX, finalY, c);
+
                 }
             }
+
+
 
             _snowPathTexture.Apply();
             _snowPlaneMeshRenderer.material.SetTexture("_InteractiveSnowTexture", _snowPathTexture);
             _snowPlaneMeshRenderer.material.SetVector("_PlayerPosition", new Vector4(_playerTransform.position.x, _playerTransform.position.y, _playerTransform.position.z));
         }
 
-        /// <summary>
-        /// Extremely inefficient
-        /// </summary>
-        private void RefillTexture()
-        {
 
-            for (int i = 0; i < _snowPathTexture.height; i++)
+        public float PaintOnTexture()
+        {
+            float totalDeltaBrightness = 0;
+            int halfMaskWidthHeight = _snowMeltingMask.width / 2;
+            for (int i = 0; i < _snowMeltingMask.height; i++)
             {
-                for (int j = 0; j < _snowPathTexture.width; j++)
+                for (int j = 0; j < _snowMeltingMask.width; j++)
                 {
-                    Color c = _snowPathTexture.GetPixel(j, i);
-                    float val = 0.1f;
-                    c.r += val;
-                    _snowPathTexture.SetPixel(j, i, c);
+                    int xPos = _texturePosX + j - halfMaskWidthHeight;
+                    int yPos = _texturePosY + i - halfMaskWidthHeight;
+                    float brightVal = _snowPathTexture.GetPixel(xPos, yPos).r;
+                    float temp = brightVal;
+                    Debug.Log("Before: " + temp);
+                    brightVal -= _snowMeltingMask.GetPixel(j, i).r * _playerSnowMeltingRate * Time.deltaTime;
+                    temp -= brightVal;
+                    Debug.Log("After: " + temp);
+                    Color colorToApply = new Color(brightVal, brightVal, brightVal);
+                    _snowPathTexture.SetPixel(xPos, yPos, colorToApply);
                 }
             }
+            _snowPathTexture.Apply();
+            _snowPlaneMeshRenderer.material.SetTexture("_InteractiveSnowTexture", _snowPathTexture);
+            _snowPlaneMeshRenderer.material.SetVector("_PlayerPosition", new Vector4(_playerTransform.position.x, _playerTransform.position.y, _playerTransform.position.z));
+            return totalDeltaBrightness;
         }
     }
 }

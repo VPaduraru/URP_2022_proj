@@ -44,6 +44,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 8c368d0a1eddee54b83791249f6d8fa0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2DLOD_68a2cbe344d84596855eaef15bfa6061_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: c5edf55fa61824a4a91fd5cb8f399477, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_50997ec10a16461a8e4cc308b136444e_Texture_1_Texture2D:
         m_Texture: {fileID: 2800000, guid: 0fecea51f9cd19f49aca1edf8f7a0e62, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -68,8 +72,8 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _SnowSparkleIntensity: 1.8
-    - _SparklesTiling: 50
+    - _SnowSparkleIntensity: 3.2
+    - _SparklesTiling: 69.91
     - _translate_y1: 0.02
     m_Colors:
     - _PlayerPosition: {r: 0, g: 0, b: 0, a: 0}
