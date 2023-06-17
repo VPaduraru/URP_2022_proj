@@ -77,8 +77,9 @@ namespace SnowProject
         {
             return _snowPathTexture.GetPixel(_texturePosX, _texturePosY).r;
         }
-        public void PaintOnTextureCustomMaskFromPlayerRotation(float rotationDegrees)
+        public float PaintOnTextureCustomMaskFromPlayerRotation(float rotationDegrees)
         {
+            float totalBrightness = 0;
             float rads = -rotationDegrees * Mathf.Deg2Rad - Mathf.PI;
             rads += Random.Range(-.1f, .1f);
             int maskHalfWidth = _toolMeltingMask.width / 2;
@@ -109,13 +110,17 @@ namespace SnowProject
                     int finalY = rotatedY + yOffset;
 
                     float val = _snowPathTexture.GetPixel(finalX, finalY).r;
+                    float temp = Mathf.Clamp01(val);
+                    temp = Mathf.RoundToInt(temp * 100000) / 100000f;
                     val -= r * Time.deltaTime * _playerSnowMeltingRate / 2;
                     val = Mathf.Clamp01(val);
+                    totalBrightness += temp - val;
                     Color c = new Color(val, val, val);
 
                     _snowPathTexture.SetPixel(finalX, finalY, c);
 
                 }
+
             }
 
 
@@ -123,12 +128,13 @@ namespace SnowProject
             _snowPathTexture.Apply();
             _snowPlaneMeshRenderer.material.SetTexture("_InteractiveSnowTexture", _snowPathTexture);
             _snowPlaneMeshRenderer.material.SetVector("_PlayerPosition", new Vector4(_playerTransform.position.x, _playerTransform.position.y, _playerTransform.position.z));
+            return totalBrightness;
         }
 
 
         public float PaintOnTexture()
         {
-            float totalDeltaBrightness = 0;
+            float totalBrightness = 0;
             int halfMaskWidthHeight = _snowMeltingMask.width / 2;
             for (int i = 0; i < _snowMeltingMask.height; i++)
             {
@@ -138,10 +144,12 @@ namespace SnowProject
                     int yPos = _texturePosY + i - halfMaskWidthHeight;
                     float brightVal = _snowPathTexture.GetPixel(xPos, yPos).r;
                     float temp = brightVal;
-                    Debug.Log("Before: " + temp);
+                    //Debug.Log("Before: " + temp);
                     brightVal -= _snowMeltingMask.GetPixel(j, i).r * _playerSnowMeltingRate * Time.deltaTime;
-                    temp -= brightVal;
-                    Debug.Log("After: " + temp);
+                    brightVal = Mathf.Clamp01(brightVal);
+                    //Debug.Log("After: " + temp);
+                    float delta = temp - brightVal;
+                    totalBrightness += delta;
                     Color colorToApply = new Color(brightVal, brightVal, brightVal);
                     _snowPathTexture.SetPixel(xPos, yPos, colorToApply);
                 }
@@ -149,7 +157,7 @@ namespace SnowProject
             _snowPathTexture.Apply();
             _snowPlaneMeshRenderer.material.SetTexture("_InteractiveSnowTexture", _snowPathTexture);
             _snowPlaneMeshRenderer.material.SetVector("_PlayerPosition", new Vector4(_playerTransform.position.x, _playerTransform.position.y, _playerTransform.position.z));
-            return totalDeltaBrightness;
+            return totalBrightness;
         }
     }
 }

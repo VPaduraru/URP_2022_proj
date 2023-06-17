@@ -19,9 +19,12 @@ namespace SnowProject
         private float _verticalRotation = 0f;
         private CharacterController _charController;
 
-        #region Gameplay Mechanincs
+        #region Gameplay Mechanics
+        [Header("Gameplay Mechanics")]
+        float _accumulationSnowMultiplier = 0.001f;
         float _currentPlaneHeight = 0;
         float _accumulatedSnow = 0f;
+
         #endregion
 
         #region Events
@@ -46,7 +49,8 @@ namespace SnowProject
             float rightRotationAngle = transform.eulerAngles.y;
             if (Input.GetButton("Fire1"))
             {
-                SnowController.Instance.PaintOnTextureCustomMaskFromPlayerRotation(transform.eulerAngles.y);
+                _accumulatedSnow += SnowController.Instance.PaintOnTextureCustomMaskFromPlayerRotation(transform.eulerAngles.y) * _accumulationSnowMultiplier;
+                OnCollectSnow.Invoke();
             }
             //Debug.LogFormat("Forward: {0}, Right: {1}", forward, right);
             //Debug.LogFormat("rightRotationAngle: {0}", rightRotationAngle);
@@ -56,7 +60,7 @@ namespace SnowProject
 
             if (IsPlayerMoving)
             {
-                _accumulatedSnow += SnowController.Instance.PaintOnTexture();
+                _accumulatedSnow += SnowController.Instance.PaintOnTexture() * _accumulationSnowMultiplier;
                 OnCollectSnow.Invoke();
             }
         }
@@ -93,15 +97,6 @@ namespace SnowProject
             _verticalRotation = Mathf.Clamp(_verticalRotation, -20, 40);
             transform.Rotate(Vector3.up, Input.GetAxis("Mouse X"));
             _cameraPivot.transform.localEulerAngles = new Vector3(_verticalRotation, _cameraPivot.transform.localEulerAngles.y, _cameraPivot.transform.localEulerAngles.z);
-        }
-
-        private void AccumulateSnow()
-        {
-            if (IsPlayerMoving)
-            {
-                _accumulatedSnow += _currentPlaneHeight / 100f;
-                OnCollectSnow.Invoke();
-            }
         }
 
         public float GetAccumulatedSnow()
