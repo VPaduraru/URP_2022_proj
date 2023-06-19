@@ -4,9 +4,15 @@ namespace SnowProject
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.Events;
+    using UnityEngine.VFX;
 
     public class PlayerController : MonoBehaviour
     {
+        [Header("VFX")]
+        [SerializeField]
+        private Transform _fromVfxTransform;
+        [SerializeField]
+        private VisualEffect[] _snowVFX;
         [Header("Movement values")]
         [SerializeField]
         private float _maxSpeed = 10f;
@@ -41,9 +47,31 @@ namespace SnowProject
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            StartCoroutine(VfxDebugThingy());
+        }
+
+        private IEnumerator VfxDebugThingy()
+        {
+            int index = 0;
+            while (true)
+            {
+                _snowVFX[index].SetVector3("StartingPos", _fromVfxTransform.position);
+                yield return new WaitForSeconds(1.0f);
+                index++;
+                if (index > 3)
+                {
+                    index = 0;
+                }
+            }
         }
         private void Update()
         {
+            foreach (VisualEffect vfx in _snowVFX)
+            {
+                vfx.enabled = Input.GetButton("Fire1");
+                vfx.SetVector3("EndingPos", transform.position + Vector3.up * 0.5f);
+            }
+
             MouseRotation();
             MovementInput();
             float rightRotationAngle = transform.eulerAngles.y;
