@@ -30,6 +30,9 @@
     "m_CategoryData": [
         {
             "m_Id": "f3857f5b87414e8890182e97f6b5f581"
+        },
+        {
+            "m_Id": "819c4a1695274a329af77ff0375a1b3c"
         }
     ],
     "m_Nodes": [
@@ -5063,6 +5066,36 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.CategoryData",
+    "m_ObjectId": "819c4a1695274a329af77ff0375a1b3c",
+    "m_Name": "Snow",
+    "m_ChildObjectList": [
+        {
+            "m_Id": "2d505eda0bf3478792aa420afdfe46f1"
+        },
+        {
+            "m_Id": "36187006329440e384105badf38de94f"
+        },
+        {
+            "m_Id": "88c38e3cbbe04d0d8aade93130ed4e8d"
+        },
+        {
+            "m_Id": "f365d1a532e447e2a76f0c3b083539c6"
+        },
+        {
+            "m_Id": "310d89db3e75456b814f2dc9243fe707"
+        },
+        {
+            "m_Id": "f91a53fad2534e669ab9fe7f11d26cd6"
+        },
+        {
+            "m_Id": "ddea35b4a1da4be98d8af7c206f7076d"
+        }
+    ]
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicValueMaterialSlot",
     "m_ObjectId": "85d2c11403d740d4ae8d6dc56a0a469b",
     "m_Id": 2,
@@ -8610,29 +8643,7 @@
     "m_Type": "UnityEditor.ShaderGraph.CategoryData",
     "m_ObjectId": "f3857f5b87414e8890182e97f6b5f581",
     "m_Name": "",
-    "m_ChildObjectList": [
-        {
-            "m_Id": "36187006329440e384105badf38de94f"
-        },
-        {
-            "m_Id": "88c38e3cbbe04d0d8aade93130ed4e8d"
-        },
-        {
-            "m_Id": "310d89db3e75456b814f2dc9243fe707"
-        },
-        {
-            "m_Id": "f91a53fad2534e669ab9fe7f11d26cd6"
-        },
-        {
-            "m_Id": "f365d1a532e447e2a76f0c3b083539c6"
-        },
-        {
-            "m_Id": "ddea35b4a1da4be98d8af7c206f7076d"
-        },
-        {
-            "m_Id": "2d505eda0bf3478792aa420afdfe46f1"
-        }
-    ]
+    "m_ChildObjectList": []
 }
 
 {
