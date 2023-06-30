@@ -14,8 +14,8 @@ namespace SnowProject.Vfx
 
         private void Update()
         {
-            _gatheringVisualEffect.SetVector3("ToPosition", transform.position);
-            _gatheringVisualEffect.transform.position = _gatheringVisualEffectPosObj.position;
+            //_gatheringVisualEffect.SetVector3("ToPosition", transform.position);
+            //_gatheringVisualEffect.transform.position = _gatheringVisualEffectPosObj.position;
         }
     }
 

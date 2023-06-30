@@ -50,11 +50,11 @@ namespace SnowProject
             MouseRotation();
             MovementInput();
             float rightRotationAngle = transform.eulerAngles.y;
-            if (Input.GetButton("Fire1"))
-            {
-                _accumulatedSnow += SnowController.Instance.PaintOnTextureCustomMaskFromPlayerRotation(transform.eulerAngles.y) * _accumulationSnowMultiplier;
-                OnCollectSnow.Invoke();
-            }
+            //if (Input.GetButton("Fire1"))
+            //{
+            //    _accumulatedSnow += SnowController.Instance.PaintOnTextureCustomMaskFromPlayerRotation(transform.eulerAngles.y) * _accumulationSnowMultiplier;
+            //    OnCollectSnow.Invoke();
+            //}
             //Debug.LogFormat("Forward: {0}, Right: {1}", forward, right);
             //Debug.LogFormat("rightRotationAngle: {0}", rightRotationAngle);
 
