@@ -25,7 +25,7 @@ public class RasenganController : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, hit.point, _speed * Time.deltaTime);
         }
         _velocity = _lastPosition - transform.position;
-        transform.rotation = Quaternion.LookRotation(_velocity);
+        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(_velocity), _speed * 5f * Time.deltaTime);
 
         if (Input.GetKey(KeyCode.Escape))
         {
